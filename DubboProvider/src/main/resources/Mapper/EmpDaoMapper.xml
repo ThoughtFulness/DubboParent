@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.ssm.dao.EmpDao">
+    <!--分页查询-->
+    <select id="getPage" resultType="map">
+        select * from (select rownum rn,t.* from (select *from emp
+        <where>
+            <if test="sel!=null and sel!=''">
+                and  ( empno like '%'||#{sel}||'%' or ename like '%'||#{sel}||'%' or job like '%'||#{sel}||'%' or sal like '%'||#{sel}||'%'
+                or comm like '%'||#{sel}||'%' or deptno like '%'||#{sel}||'%')
+            </if>
+        </where>
+        ) t where rownum  &lt; #{end}) a where a.rn &gt; #{start} order by empno DESC
+    </select>
+    <!--分页总数量-->
+    <select id="getPageCount" resultType="int">
+        select count(*) from emp
+        <where>
+            <if test="sel!=null and sel!=''">
+                and  ( empno like '%'||#{sel}||'%' or ename like '%'||#{sel}||'%' or job like '%'||#{sel}||'%' or sal like '%'||#{sel}||'%'
+                or comm like '%'||#{sel}||'%' or deptno like '%'||#{sel}||'%')
+            </if>
+        </where>
+    </select>
+    <!--新增员工-->
+   <!-- <insert id="AddEmp">
+        insert into emp(empno,ename,job,sal,hiredate,comm,deptNo) values(SEQ_EMP_ID.nextval,#{eName},#{job},#{sal},sysdate,#{comm},#{deptNo})
+    </insert>-->
+
+    <!--员工添加-->
+    <insert id="AddEmp">
+        /*mybatis添加返回主键*/
+        <selectKey keyProperty="empNo" order="BEFORE" resultType="int">
+            select SEQ_EMP_ID.nextval from dual
+        </selectKey>
+        insert into emp(empno,ename,job,sal,hiredate,comm,deptNo) values(#{empNo},#{eName},#{job},#{sal},sysdate,#{comm},#{deptNo})
+    </insert>
+
+    <!--删除员工-->
+    <delete id="delete" >
+         delete from emp where empno=#{EMPNO}
+    </delete>
+    <!--通过ID查询员工ID-->
+    <select id="getListEmp" resultType="map">
+        select * from emp where empno=#{EMPNO}
+    </select>
+    <!--更新-->
+    <update id="update">
+        update emp set ename=#{eName},job=#{job},sal=#{sal},comm=#{comm},deptno=#{deptNo}  where empno=#{empNo}
+    </update>
+</mapper>
